@@ -2,13 +2,14 @@ version: '2.2'
 
 services:
   api:
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     build:
       context: ./saleor
       dockerfile: ./Dockerfile.dev
       args:
         STATIC_URL: '/static/'
+        API_URI: 'http://localhost:8000/graphql/'
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -36,8 +37,10 @@ services:
     build:
       context: ./saleor-storefront
       dockerfile: ./Dockerfile.dev
-    ports:
-      - 3000:3000
+      args:
+        API_URI: 'http://localhost:8000/graphql/'
+    expose:
+      - 3000
     restart: unless-stopped
     volumes:
       - ./saleor-storefront/:/app:cached
@@ -50,8 +53,10 @@ services:
     build:
       context: ./saleor-dashboard
       dockerfile: ./Dockerfile.dev
-    ports:
-      - 9000:9000
+      args:
+        API_URI: 'http://localhost:8000/graphql/'
+    expose:
+      - 9000
     restart: unless-stopped
     volumes:
       - ./saleor-dashboard/:/app:cached
@@ -62,8 +67,8 @@ services:
 
   db:
     image: library/postgres:11.1-alpine
-    ports:
-      - 5432:5432
+    expose:
+      - 5432
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -75,8 +80,8 @@ services:
 
   redis:
     image: library/redis:5.0-alpine
-    ports:
-      - 6379:6379
+    expose:
+      - 6379
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -106,14 +111,14 @@ services:
 
   jaeger:
     image: jaegertracing/all-in-one
-    ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
-      - "16686:16686"
-      - "14268:14268"
-      - "9411:9411"
+    expose:
+      - 5775
+      - 6831
+      - 6832
+      - 5778
+      - 16686
+      - 14268
+      - 9411
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -143,6 +148,7 @@ volumes:
   saleor-redis:
     driver: local
   saleor-media:
+  static_volume:
 
 networks:
   saleor-backend-tier:

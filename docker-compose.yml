@@ -9,6 +9,7 @@ services:
       dockerfile: ./Dockerfile.dev
       args:
         STATIC_URL: '/static/'
+        API_URI: 'http://localhost:8000/graphql/'
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -36,6 +37,8 @@ services:
     build:
       context: ./saleor-storefront
       dockerfile: ./Dockerfile.dev
+      args:
+        API_URI: 'http://localhost:8000/graphql/'
     ports:
       - 3000:3000
     restart: unless-stopped
@@ -48,6 +51,8 @@ services:
     build:
       context: ./saleor-dashboard
       dockerfile: ./Dockerfile.dev
+      args:
+        API_URI: 'http://localhost:8000/graphql/'
     ports:
       - 9000:9000
     restart: unless-stopped
