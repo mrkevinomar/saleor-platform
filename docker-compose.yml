@@ -1,4 +1,4 @@
-version: '2'
+version: '2.2'
 
 services:
   api:
@@ -6,7 +6,7 @@ services:
       - 8000:8000
     build:
       context: ./saleor
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.dev
       args:
         STATIC_URL: '/static/'
     restart: unless-stopped
@@ -82,7 +82,7 @@ services:
   worker:
     build:
       context: ./saleor
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.dev
       args:
         STATIC_URL: '/static/'
     command: celery -A saleor worker --app=saleor.celeryconf:app --loglevel=info
