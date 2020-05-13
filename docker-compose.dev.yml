@@ -1,4 +1,4 @@
-version: '2'
+version: '2.2'
 
 services:
   api:
@@ -9,7 +9,6 @@ services:
       dockerfile: ./Dockerfile.dev
       args:
         STATIC_URL: '/static/'
-        API_URI: 'http://localhost:8000/graphql/'
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -43,6 +42,8 @@ services:
     volumes:
       - ./saleor-storefront/:/app:cached
       - /app/node_modules/
+    networks:
+      - saleor-backend-tier
     command: npm start -- --host 0.0.0.0
 
   dashboard:
@@ -55,6 +56,8 @@ services:
     volumes:
       - ./saleor-dashboard/:/app:cached
       - /app/node_modules/
+    networks:
+      - saleor-backend-tier
     command: npm start -- --host 0.0.0.0
 
   db:
@@ -115,6 +118,25 @@ services:
     networks:
       - saleor-backend-tier
 
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - static_volume:/home/app/static/
+      - saleor-media:/app/media
+    ports:
+      - 80:80
+    links:
+      - api:api
+      - dashboard:dashboard
+      - storefront:storefront
+    depends_on:
+      - api
+      - dashboard
+      - storefront
+    networks:
+      - saleor-backend-tier
 volumes:
   saleor-db:
     driver: local
