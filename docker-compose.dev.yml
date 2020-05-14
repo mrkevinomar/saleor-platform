@@ -40,14 +40,14 @@ services:
       args:
         API_URI: 'http://localhost:8000/graphql/'
     expose:
-      - 3000
+      - 80
     restart: unless-stopped
     volumes:
       - ./saleor-storefront/:/app:cached
       - /app/node_modules/
     networks:
       - saleor-backend-tier
-    command: npm start -- --host 0.0.0.0
+    command: npm run dev -- --host 0.0.0.0
 
   dashboard:
     build:
