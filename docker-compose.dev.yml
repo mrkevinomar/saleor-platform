@@ -22,8 +22,9 @@ services:
       - ./saleor/templates/:/app/templates:Z
       - ./saleor/tests/:/app/tests
       # prevents overshadowing of build-time assets
-      - /app/saleor/static/assets
-      - /app/templates/templated_email/compiled
+      #- /app/saleor/static/assets
+      - ./webpack-bundle.json:/app/webpack-bundle.json:Z
+      #- /app/templates/templated_email/compiled
       # shared volume between worker and api for media
       - saleor-media:/app/media
     command: python manage.py runserver 0.0.0.0:8000
