@@ -49,7 +49,6 @@ services:
       - /app/node_modules/
     networks:
       - saleor-backend-tier
-    command: npm run build
 
   dashboard:
     build:
@@ -65,7 +64,6 @@ services:
       - /app/node_modules/
     networks:
       - saleor-backend-tier
-    command: npm run build
 
   db:
     image: library/postgres:11.1-alpine
