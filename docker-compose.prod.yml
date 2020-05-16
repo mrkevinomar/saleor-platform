@@ -67,6 +67,19 @@ services:
       - saleor-backend-tier
     command: npm run build
 
+  db:
+    image: library/postgres:11.1-alpine
+    expose:
+      - 5432
+    restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+    volumes:
+      - saleor-db:/var/lib/postgresql
+    environment:
+      - POSTGRES_USER=saleor
+      - POSTGRES_PASSWORD=saleor
+      
   redis:
     image: library/redis:5.0-alpine
     expose:
