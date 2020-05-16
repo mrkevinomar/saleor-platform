@@ -103,51 +103,37 @@ services:
 
   jaeger:
     image: jaegertracing/all-in-one
-    ports:
-      - 5775:5775
-      - 6831:6831
-      - 6832:6832
-      - 5778:5778
-      - 16686:16686
-      - 14268:14268
-      - 9411:9411
+    expose:
+      - 5775
+      - 6831
+      - 6832
+      - 5778
+      - 16686
+      - 14268
+      - 9411
     restart: unless-stopped
     networks:
       - saleor-backend-tier
-
-      jaeger:
-        image: jaegertracing/all-in-one
-        expose:
-          - 5775
-          - 6831
-          - 6832
-          - 5778
-          - 16686
-          - 14268
-          - 9411
-        restart: unless-stopped
-        networks:
-          - saleor-backend-tier
-    nginx:
-      restart: always
-      build:
-        context: ./nginx
-        dockerfile: ./Dockerfile
-      volumes:
-        - static_volume:/home/app/static/
-        - saleor-media:/app/media
-      ports:
-        - 80:80
-      links:
-        - api:api
-        - dashboard:dashboard
-        - storefront:storefront
-      depends_on:
-        - api
-        - dashboard
-        - storefront
-      networks:
-        - saleor-backend-tier
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: ./Dockerfile
+    volumes:
+      - static_volume:/home/app/static/
+      - saleor-media:/app/media
+    ports:
+      - 80:80
+    links:
+      - api:api
+      - dashboard:dashboard
+      - storefront:storefront
+    depends_on:
+      - api
+      - dashboard
+      - storefront
+    networks:
+      - saleor-backend-tier
 
 volumes:
   saleor-db:
