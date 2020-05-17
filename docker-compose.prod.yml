@@ -1,46 +1,14 @@
 version: '2.2'
 
 services:
-  api:
-    expose:
-      - 8000
-    build:
-      context: ./saleor
-      dockerfile: ./Dockerfile
-      args:
-        STATIC_URL: '/static/'
-    restart: unless-stopped
-    networks:
-      - saleor-backend-tier
-    depends_on:
-      - db
-      - redis
-      - jaeger
-    volumes:
-      - ./saleor/saleor/:/app/saleor:Z
-      - ./saleor/templates/:/app/templates:Z
-      - ./saleor/tests/:/app/tests
-      # prevents overshadowing of build-time assets
-      #- /app/saleor/static/assets
-      - ./webpack-bundle.json:/app/webpack-bundle.json:Z
-      #- /app/templates/templated_email/compiled
-      # shared volume between worker and api for media
-      - saleor-media:/app/media
-    command: gunicorn saleor.wsgi:application --bind 0.0.0.0:8000
-    env_file: ./saleor/common.prod.env
-    environment:
-      - JAEGER_AGENT_HOST=jaeger
-      - STOREFRONT_URL=http://3.132.182.123/
-      - DASHBOARD_URL=http://3.132.182.123/dashboard
-
   storefront:
     build:
       context: ./saleor-storefront
       dockerfile: ./Dockerfile
       args:
-        API_URI: 'http://3.132.182.123/graphql/'
+        API_URI: 'http://3.16.58.159/graphql/'
     environment:
-      - API_URI=http://3.132.182.123/graphql/
+      - API_URI=http://3.16.58.159/graphql/
     expose:
       - 3000
     restart: unless-stopped
@@ -55,7 +23,7 @@ services:
       context: ./saleor-dashboard
       dockerfile: ./Dockerfile
     environment:
-      - API_URI=http://3.132.182.123/graphql/
+      - API_URI=http://3.16.58.159/graphql/
     expose:
       - 9000
     restart: unless-stopped
@@ -65,66 +33,6 @@ services:
     networks:
       - saleor-backend-tier
 
-  db:
-    image: library/postgres:11.1-alpine
-    expose:
-      - 5432
-    restart: unless-stopped
-    networks:
-      - saleor-backend-tier
-    volumes:
-      - saleor-db:/var/lib/postgresql
-    environment:
-      - POSTGRES_USER=saleor
-      - POSTGRES_PASSWORD=saleor
-      
-  redis:
-    image: library/redis:5.0-alpine
-    expose:
-      - 6379
-    restart: unless-stopped
-    networks:
-      - saleor-backend-tier
-    volumes:
-      - saleor-redis:/data
-
-  worker:
-    build:
-      context: ./saleor
-      dockerfile: ./Dockerfile
-      args:
-        STATIC_URL: '/static/'
-    command: celery -A saleor worker --app=saleor.celeryconf:app --loglevel=info
-    restart: unless-stopped
-    networks:
-      - saleor-backend-tier
-    env_file: ./saleor/common.env
-    depends_on:
-      - redis
-    volumes:
-      - ./saleor/saleor/:/app/saleor:Z
-      - ./saleor/templates/:/app/templates:Z
-      - ./saleor/tests/:/app/tests
-      # prevents overshadowing of build-time assets
-      #- /app/saleor/static/assets
-      - ./webpack-bundle.json:/app/webpack-bundle.json:Z
-      #- /app/templates/templated_email/compiled
-      # shared volume between worker and api for media
-      - saleor-media:/app/media
-
-  jaeger:
-    image: jaegertracing/all-in-one
-    expose:
-      - 5775
-      - 6831
-      - 6832
-      - 5778
-      - 16686
-      - 14268
-      - 9411
-    restart: unless-stopped
-    networks:
-      - saleor-backend-tier
   nginx:
     restart: always
     build:
@@ -136,21 +44,15 @@ services:
     ports:
       - 80:80
     links:
-      - api:api
       - dashboard:dashboard
       - storefront:storefront
     depends_on:
-      - api
       - dashboard
       - storefront
     networks:
       - saleor-backend-tier
 
 volumes:
-  saleor-db:
-    driver: local
-  saleor-redis:
-    driver: local
   saleor-media:
   static_volume:
 
