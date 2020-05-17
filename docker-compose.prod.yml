@@ -10,7 +10,7 @@ services:
     environment:
       - API_URI=http://3.16.58.159/graphql/
     expose:
-      - 3000:80
+      - 3000
     restart: unless-stopped
     volumes:
       - ./saleor-storefront/:/app:cached
@@ -25,7 +25,7 @@ services:
     environment:
       - API_URI=http://3.16.58.159/graphql/
     expose:
-      - 9000:80
+      - 9000
     restart: unless-stopped
     volumes:
       - ./saleor-dashboard/:/app:cached
